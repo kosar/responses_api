@@ -2,6 +2,8 @@
 
 A real-time streaming demo application built with Next.js that showcases OpenAI's Responses API capabilities, including web search integration and event-driven response handling.
 
+![OpenAI Responses API Demo Screenshot](responses_api_demo.jpg)
+
 ## Overview
 
 This application demonstrates the capabilities of OpenAI's Responses API, a new offering that provides enhanced control over response generation and real-time event handling. The demo features a dual-panel interface that separates API events from response content, making it ideal for developers who want to understand the internals of OpenAI's streaming responses.
