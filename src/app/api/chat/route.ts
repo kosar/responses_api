@@ -15,7 +15,7 @@ interface Message {
 }
 
 export async function POST(req: Request) {
-  const { messages } = await req.json();
+  const { messages, enableWebSearch = false } = await req.json();
 
   // Create a response using the Responses API
   const response = await openai.responses.create({
@@ -25,6 +25,7 @@ export async function POST(req: Request) {
       content: msg.content
     })),
     stream: true,
+    tools: enableWebSearch ? [{ type: 'web_search_preview' }] : [],
     text: {
       format: {
         type: 'text'
@@ -46,6 +47,7 @@ export async function POST(req: Request) {
       try {
         let currentMessage = '';
         let lastEventType = '';
+        let webSearchResults: any[] = [];
 
         for await (const event of response) {
           if (!event || !event.type) continue;
@@ -62,6 +64,56 @@ export async function POST(req: Request) {
               emitEvent({ type: 'event', value: event });
               break;
 
+            case 'response.web_search_call.searching':
+              emitEvent({
+                type: 'event',
+                value: {
+                  type: 'web_search.started',
+                  timestamp: Date.now()
+                }
+              });
+              break;
+
+            case 'response.web_search_call.results':
+              if (event.results && Array.isArray(event.results)) {
+                webSearchResults = event.results;
+                emitEvent({
+                  type: 'event',
+                  value: {
+                    type: 'web_search.results',
+                    timestamp: Date.now(),
+                    results: webSearchResults.map(result => ({
+                      title: result.title || '',
+                      url: result.url || '',
+                      snippet: result.snippet || ''
+                    }))
+                  }
+                });
+              }
+              break;
+
+            case 'response.web_search_call.completed':
+              emitEvent({
+                type: 'event',
+                value: {
+                  type: 'web_search.completed',
+                  timestamp: Date.now(),
+                  resultCount: webSearchResults.length
+                }
+              });
+              break;
+
+            case 'response.web_search_call.failed':
+              emitEvent({
+                type: 'event',
+                value: {
+                  type: 'web_search.failed',
+                  timestamp: Date.now(),
+                  error: event.error?.message || 'Web search failed'
+                }
+              });
+              break;
+
             case 'response.output_text.delta':
               if (event.delta) {
                 currentMessage += event.delta;
@@ -75,7 +127,8 @@ export async function POST(req: Request) {
               emitEvent({ 
                 type: 'event', 
                 value: {
-                  ...event,
+                  type: 'response.output_text.done',
+                  timestamp: Date.now(),
                   finalText: currentMessage
                 }
               });
@@ -95,7 +148,7 @@ export async function POST(req: Request) {
               return;
 
             case 'response.failed':
-              throw new Error(event.response?.error?.message || 'Response failed');
+              throw new Error(event.error?.message || 'Response failed');
 
             case 'response.incomplete':
               emitEvent({ 
@@ -129,11 +182,5 @@ export async function POST(req: Request) {
     }
   });
 
-  return new Response(stream, {
-    headers: {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
-    },
-  });
+  return new StreamingTextResponse(stream);
 } 
