@@ -250,6 +250,8 @@ The application handles the following event types from the Responses API:
 - `response.web_search_call.completed`: Web search completed
 - `response.web_search_call.failed`: Web search operation failed
 
+*NOTE:* At the time of this wriitng, not all the web search events appear in the event traffic. Not clear why, yet. 
+
 Each event includes timestamps and elapsed time information, allowing you to track the duration of each step in the response generation process.
 
 ### Web Search Feature
