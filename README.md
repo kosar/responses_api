@@ -64,7 +64,7 @@ The Responses API represents a significant evolution from the traditional Chat C
 
 4. **Structured Response Format**: Instead of the Chat API's simple `choices` array, the Responses API returns a typed `response` object with clear event types and structured data, making it easier to build type-safe applications.
 
-## Key Features
+## Demo App Key Highlights & Features
 
 - **Real-time Event Streaming**: Visualize OpenAI's response generation process through a detailed event panel
 - **Web Search Integration**: Enable real-time web search capabilities during response generation
