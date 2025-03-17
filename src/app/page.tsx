@@ -376,33 +376,33 @@ export default function Home() {
           </form>
         </div>
 
-        {/* API Events Panel */}
-        <div className="w-96 border-l bg-gray-50/80 backdrop-blur-sm flex flex-col h-full">
+        {/* Responses API Events Panel */}
+        <div className="w-72 border-l bg-gray-50/80 backdrop-blur-sm flex flex-col h-full">
           <div className="flex-none border-b bg-white/80 backdrop-blur-sm px-3 py-2 sticky top-0 z-10">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <div className="p-1.5 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg shadow-sm">
-                  <CodeBracketIcon className="w-4 h-4 text-gray-700" />
+                  <CodeBracketIcon className="w-3.5 h-3.5 text-gray-700" />
                 </div>
-                <h2 className="font-medium text-sm text-gray-900">API Events</h2>
+                <h2 className="font-medium text-xs text-gray-900">Responses API Events</h2>
               </div>
               {totalElapsedTime && (
-                <div className="flex items-center gap-2 px-2 py-1 bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100 rounded-full shadow-sm">
+                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100 rounded-full shadow-sm">
                   <ClockIcon className="w-3 h-3 text-indigo-500" />
                   <span className="text-xs font-medium text-indigo-700">
-                    Total: {formatElapsedTime(totalElapsedTime)}
+                    {formatElapsedTime(totalElapsedTime)}
                   </span>
                 </div>
               )}
             </div>
           </div>
           
-          <div className="flex-1 overflow-y-auto p-3 space-y-3">
-            {apiEvents.map((event, index) => (
+          <div className="flex-1 overflow-y-auto p-2 space-y-2">
+            {apiEvents.filter(event => !event.type.startsWith('web_search')).map((event, index) => (
               <div
                 key={index}
                 className={clsx(
-                  'rounded-lg p-3 text-sm font-mono relative',
+                  'rounded-lg p-2 text-xs font-mono relative',
                   'animate-fade-in transition-all duration-300',
                   'hover:shadow-md',
                   'border backdrop-blur-sm',
@@ -411,35 +411,29 @@ export default function Home() {
                   event.type === 'response.in_progress' ? 'bg-yellow-50/80 border-yellow-100' :
                   event.type === 'response.output_text.delta' ? 'bg-green-50/80 border-green-100' :
                   event.type === 'response.completed' ? 'bg-emerald-50/80 border-emerald-100' :
-                  event.type === 'web_search.started' ? 'bg-indigo-50/80 border-indigo-100' :
-                  event.type === 'web_search.results' ? 'bg-indigo-50/80 border-indigo-100' :
-                  event.type === 'web_search.completed' ? 'bg-indigo-50/80 border-indigo-100' :
                   'bg-gray-50/80 border-gray-100'
                 )}
               >
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-1.5">
                   <span className={clsx(
-                    'text-xs font-medium px-2 py-1 rounded-full shadow-sm',
+                    'text-[10px] font-medium px-1.5 py-0.5 rounded-full shadow-sm',
                     'transition-colors duration-200',
                     event.type === 'request' ? 'bg-gradient-to-r from-blue-100 to-blue-50 text-blue-700' :
                     event.type === 'response.created' ? 'bg-gradient-to-r from-purple-100 to-purple-50 text-purple-700' :
                     event.type === 'response.in_progress' ? 'bg-gradient-to-r from-yellow-100 to-yellow-50 text-yellow-700' :
                     event.type === 'response.output_text.delta' ? 'bg-gradient-to-r from-green-100 to-green-50 text-green-700' :
                     event.type === 'response.completed' ? 'bg-gradient-to-r from-emerald-100 to-emerald-50 text-emerald-700' :
-                    event.type === 'web_search.started' ? 'bg-gradient-to-r from-indigo-100 to-indigo-50 text-indigo-700' :
-                    event.type === 'web_search.results' ? 'bg-gradient-to-r from-indigo-100 to-indigo-50 text-indigo-700' :
-                    event.type === 'web_search.completed' ? 'bg-gradient-to-r from-indigo-100 to-indigo-50 text-indigo-700' :
                     'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-700'
                   )}>
                     {event.type}
                   </span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] text-gray-500">
                       {new Date(event.timestamp).toLocaleTimeString()}
                     </span>
                     {event.elapsedSinceLastEvent && (
                       <span className={clsx(
-                        'text-xs font-medium px-2 py-0.5 rounded-full shadow-sm',
+                        'text-[10px] font-medium px-1.5 py-0.5 rounded-full shadow-sm',
                         'transition-colors duration-200',
                         event.elapsedSinceLastEvent < 100 ? 'bg-gradient-to-r from-green-100 to-green-50 text-green-700' :
                         event.elapsedSinceLastEvent < 500 ? 'bg-gradient-to-r from-yellow-100 to-yellow-50 text-yellow-700' :
@@ -452,7 +446,63 @@ export default function Home() {
                 </div>
                 {renderEventContent(event, index)}
                 {index < apiEvents.length - 1 && (
-                  <div className="absolute left-1/2 -bottom-2 transform -translate-x-1/2 w-px h-2 bg-gradient-to-b from-gray-200 to-transparent" />
+                  <div className="absolute left-1/2 -bottom-1.5 transform -translate-x-1/2 w-px h-1.5 bg-gradient-to-b from-gray-200 to-transparent" />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Web Search Events Panel */}
+        <div className="w-72 border-l bg-gray-50/80 backdrop-blur-sm flex flex-col h-full">
+          <div className="flex-none border-b bg-white/80 backdrop-blur-sm px-3 py-2 sticky top-0 z-10">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-gradient-to-br from-indigo-100 to-indigo-200 rounded-lg shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 text-indigo-700">
+                  <path d="M8.25 10.875a2.625 2.625 0 1 1 5.25 0 2.625 2.625 0 0 1-5.25 0Z" />
+                  <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.125 4.5a4.125 4.125 0 1 0 2.338 7.524l2.007 2.006a.75.75 0 1 0 1.06-1.06l-2.006-2.007a4.125 4.125 0 0 0-3.399-6.463Z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <h2 className="font-medium text-xs text-gray-900">Web Search Events</h2>
+            </div>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto p-2 space-y-2">
+            {apiEvents.filter(event => event.type.startsWith('web_search')).map((event, index) => (
+              <div
+                key={index}
+                className={clsx(
+                  'rounded-lg p-2 text-xs font-mono relative',
+                  'animate-fade-in transition-all duration-300',
+                  'hover:shadow-md',
+                  'border backdrop-blur-sm',
+                  'bg-indigo-50/80 border-indigo-100'
+                )}
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full shadow-sm bg-gradient-to-r from-indigo-100 to-indigo-50 text-indigo-700">
+                    {event.type}
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] text-gray-500">
+                      {new Date(event.timestamp).toLocaleTimeString()}
+                    </span>
+                    {event.elapsedSinceLastEvent && (
+                      <span className={clsx(
+                        'text-[10px] font-medium px-1.5 py-0.5 rounded-full shadow-sm',
+                        'transition-colors duration-200',
+                        event.elapsedSinceLastEvent < 100 ? 'bg-gradient-to-r from-green-100 to-green-50 text-green-700' :
+                        event.elapsedSinceLastEvent < 500 ? 'bg-gradient-to-r from-yellow-100 to-yellow-50 text-yellow-700' :
+                        'bg-gradient-to-r from-orange-100 to-orange-50 text-orange-700'
+                      )}>
+                        +{formatElapsedTime(event.elapsedSinceLastEvent)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                {renderEventContent(event, index)}
+                {index < apiEvents.filter(e => e.type.startsWith('web_search')).length - 1 && (
+                  <div className="absolute left-1/2 -bottom-1.5 transform -translate-x-1/2 w-px h-1.5 bg-gradient-to-b from-gray-200 to-transparent" />
                 )}
               </div>
             ))}
